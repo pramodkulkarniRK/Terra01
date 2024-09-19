@@ -1,0 +1,39 @@
+trigger:
+- main  # Replace with your branch
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+  AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+  AWS_REGION: 'us-east-1'  # Change to your desired region
+  TF_VERSION: '1.3.0'  # Specify the Terraform version
+
+jobs:
+- job: Terraform
+  displayName: 'Run Terraform'
+  steps:
+  - checkout: self
+
+  - task: UseTerraform@0
+    inputs:
+      version: '$(TF_VERSION)'
+
+  - script: |
+      echo "Setting up AWS credentials..."
+      echo "AWS_ACCESS_KEY_ID=$(AWS_ACCESS_KEY_ID)" >> $GITHUB_ENV
+      echo "AWS_SECRET_ACCESS_KEY=$(AWS_SECRET_ACCESS_KEY)" >> $GITHUB_ENV
+    displayName: 'Setup AWS Credentials'
+
+  - script: |
+      terraform init
+      terraform plan
+    displayName: 'Terraform Init and Plan'
+
+  - script: |
+      terraform apply -auto-approve
+    displayName: 'Terraform Apply'
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
