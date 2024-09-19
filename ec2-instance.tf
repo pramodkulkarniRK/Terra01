@@ -13,6 +13,6 @@ provider "aws" {
 }
 
 resource "aws_instance" "terrademo" {
-    ami = "ami-04b70fa74e45c3917"
+    ami = "ami-0e86e20dae9224db8"
     instance_type = "t2.micro"  
 }
